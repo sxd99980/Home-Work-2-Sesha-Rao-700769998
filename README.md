@@ -2,142 +2,102 @@ README — Homework 2 (CS5760 Natural Language Processing)
 Student: Duggineni Sesha Rao
 Course: CS5760 — Fall 2025
 Assignment: Homework 2
-# CS5760 - Natural Language Processing  
-## **Q1. Bayes’ Rule Applied to Text**
+Q1 – Bayes Rule Applied to Text
 
-### **1. Meaning of Terms**
-- **P(c): Prior Probability of Class**  
-  How likely a class is before looking at the document.  
-  Example: If 70% of emails are spam → P(spam) = 0.7.
+P(c): Prior probability of class c (likelihood of c before seeing the document).
 
-- **P(d|c): Likelihood**  
-  Probability of seeing document *d* if it belongs to class *c*.  
-  Example: Probability of seeing "discount" if an email is spam.
+P(d|c): Likelihood (chance of seeing document d if it belongs to class c).
 
-- **P(c|d): Posterior**  
-  Probability that document *d* belongs to class *c* after seeing its contents.  
-  This is what we maximize to pick the best class.
+P(c|d): Posterior probability (chance that document d belongs to c after looking at its content).
 
-### **2. Why Ignore P(d)?**
-P(d) is the same for all classes, so it does not affect which class has the highest probability.  
-We just maximize **P(c) × P(d|c)**.
+Why ignore P(d): P(d) is constant for all classes, so it doesn’t affect which class has the highest probability — we just maximize P(c) × P(d|c).
 
----
+Q2 – Add-1 (Laplace) Smoothing
 
-## **Q2. Add-1 Smoothing**
+Denominator: Add vocabulary size to token count.
+14 + 20 = 34
 
-### **1. Denominator**
-For the negative class:  
-Total tokens = 14, Vocabulary size = 20  
-**Denominator = 14 + 20 = 34**
+P(predictable | −): (2+1)/34 = 3/34 ≈ 0.0882
 
-### **2. P(predictable|−)**
-Count = 2  
-**P(predictable|−) = (2+1)/34 = 3/34 ≈ 0.0882**
+P(fun | −): (0+1)/34 = 1/34 ≈ 0.0294
 
-### **3. P(fun|−)**
-Count = 0  
-**P(fun|−) = (0+1)/34 = 1/34 ≈ 0.0294**
+Explanation: Add-1 smoothing avoids zero probabilities by giving every word at least a small chance.
 
----
+Q3 – Worked Example Document Classification
 
-## **Q3. Document Classification ("predictable no fun")**
+Document: “predictable no fun”
 
-### **Negative Class**
-Formula:  
-P(−) × P(predictable|−) × P(no|−) × P(fun|−)
+Negative class:
+(3/5) × (3/34) × (1/34) × (1/34) ≈ 0.0000458
 
-Step-by-step:  
-1. (3/5) × (3/34) = 9/170 ≈ 0.05294  
-2. (9/170) × (1/34) = 9/5780 ≈ 0.00156  
-3. (9/5780) × (1/34) = 9/196,520 ≈ 0.0000458  
+Positive class:
+(2/5) × (1/34) × (1/34) × (1/34) ≈ 0.0000102
 
-**Score(−) ≈ 0.0000458**
+Decision: Negative score > Positive score → Classify as Negative.
+Reason: Negative words occur more often in negative training data.
 
-### **Positive Class**
-Formula:  
-P(+) × P(predictable|+) × P(no|+) × P(fun|+)
+Q4 – Harms of Classification
 
-Step-by-step:  
-1. (2/5) × (1/34) = 1/85 ≈ 0.01176  
-2. (1/85) × (1/34) = 1/2890 ≈ 0.000346  
-3. (1/2890) × (1/34) = 1/98,260 ≈ 0.00001018  
+Representational harm: When a system reinforces stereotypes or misrepresents groups.
+Example: Kiritchenko & Mohammad (2018) found sentiment lexicons rated some demographic-related words more negatively, reinforcing bias.
 
-**Score(+) ≈ 0.00001018**
+Risk of censorship: Toxicity classifiers may over-block harmless speech (e.g., flagging reclaimed slurs, LGBTQ+ discussions).
 
-### **Decision**
-Since Score(−) > Score(+), **assign NEGATIVE class**.
+Performance gaps on AAE/Indian English: Training data is mostly Standard English → fewer examples → more mistakes and unfair treatment.
 
----
+Q5 – Evaluation Metrics
 
-## **Q4. Harms of Classification**
+Confusion Matrix Results:
 
-1. **Representational Harm:**  
-   When a system reinforces stereotypes or misrepresents a group.  
-   *Example:* Kiritchenko & Mohammad (2018) showed certain demographic names get more negative scores.
+Cat: Precision = 0.25, Recall = 0.25
 
-2. **Risk of Censorship:**  
-   Toxicity classifiers often block reclaimed words used by marginalized groups (Dixon et al., 2018).
+Dog: Precision = 0.4444, Recall = 0.4444
 
-3. **Performance Gap:**  
-   Models trained mostly on Standard English perform worse on African American English or Indian English because of vocabulary/grammar differences.
+Rabbit: Precision = 0.4, Recall = 0.4
 
----
+Macro-Average: Precision = Recall ≈ 0.3648
+Micro-Average: Precision = Recall ≈ 0.3889
 
-## **Q5. Confusion Matrix Metrics**
+Interpretation:
 
-### **Per-Class Metrics**
-| Class   | TP | FP | FN | Precision | Recall |
-|--------|----|----|----|-----------|-------|
-| Cat    |  5 | 15 | 15 | 0.25 | 0.25 |
-| Dog    | 20 | 25 | 25 | 0.4444 | 0.4444 |
-| Rabbit | 10 | 15 | 15 | 0.4 | 0.4 |
+Macro treats all classes equally (good for imbalance).
 
-### **Macro-Averaging**
-- Precision = (0.25 + 0.4444 + 0.4)/3 = **0.3648**  
-- Recall = (0.25 + 0.4444 + 0.4)/3 = **0.3648**
+Micro weights by total predictions (reflects overall accuracy).
 
-### **Micro-Averaging**
-- Total TP = 35, FP = 55, FN = 55  
-- Precision = 35/(35+55) = **0.3889**  
-- Recall = 35/(35+55) = **0.3889**
+Q6 – Bigram Probabilities & Zero-Probability Problem
 
-**Interpretation:**  
-- Macro treats all classes equally.  
-- Micro is dominated by frequent classes.
+P(S1: <s> I love NLP </s>): 1/3 ≈ 0.3333
 
----
+P(S2: <s> I love deep learning </s>): 1/6 ≈ 0.1667
 
-## **Q6. Bigram Probabilities & Zero-Probability Problem**
+More probable sentence: S1
 
-### **Sentence Probabilities**
-1. **S1: `<s> I love NLP </s>`**
-   (2/3) × 1 × (1/2) × 1 = **1/3 ≈ 0.3333**
+Zero-Probability Problem:
 
-2. **S2: `<s> I love deep learning </s>`**
-   (2/3) × 1 × (1/2) × 1 × (1/2) = **1/6 ≈ 0.1667**
+P(noodle|ate) = 0 → makes any sentence with “ate noodle” have probability 0.
 
-**S1 is more probable.**
+Solution: Add-1 smoothing: (0+1)/(12+10)=1/22≈0.04545 so no sentence gets probability 0.
 
-### **Zero-Probability Problem**
-- P(noodle|ate) = 0 → sentence probability becomes 0 → undefined perplexity.
+Q7 – Backoff Model
 
-### **Laplace Smoothing**
-P(noodle|ate) = (0+1)/(12+10) = **1/22 ≈ 0.04545**
+P(cats | I, like): 1/2 = 0.5
 
----
+P(dogs | You, like): Trigram unseen → backoff to bigram:
+P(dogs | like) = 1/3 ≈ 0.3333
 
-## **Q7. Backoff Model**
+Why backoff: Avoids zero probabilities for unseen trigrams by using lower-order (bigram) probabilities, giving more reliable estimates.
 
-1. **P(cats|I,like) = 1/2 = 0.5**
-2. **P(dogs|You,like):** trigram count=0 → back off to bigram:  
-   P(dogs|like) = 1/3 ≈ 0.3333
-3. **Why Backoff?**  
-   Avoids zero probabilities by using lower-order n-grams.
+Q8 – Bigram Language Model (Concept)
 
----
+Read and tokenize training corpus.
 
-## **Q8. Programming**
-Implement:
-1. Read training corpus.
-2. Count unigrams & b
+Compute unigram and bigram counts.
+
+Estimate P(w₂|w₁) using MLE.
+
+Define a function to multiply probabilities for a sentence.
+
+Test on <s> I love NLP </s> and <s> I love deep learning </s>.
+
+Choose the sentence with the higher probability as the model’s prediction.
+Reason: It represents a sequence more likely under training data.
