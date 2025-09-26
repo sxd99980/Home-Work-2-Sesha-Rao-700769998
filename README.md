@@ -2,6 +2,7 @@ README — Homework 2 (CS5760 Natural Language Processing)
 Student: Duggineni Sesha Rao
 Course: CS5760 — Fall 2025
 Assignment: Homework 2
+
 Q1 – Bayes Rule Applied to Text
 
 P(c): Prior probability of class c (likelihood of c before seeing the document).
